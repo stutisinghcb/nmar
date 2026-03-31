@@ -110,7 +110,7 @@ def get_metal(im):
     return metal
 
 
-def mar(im, show_result=True):
+def mar(im, show_result=True, save_dir=None):
     '''
     param:
         im: two dimensinal numpy array
@@ -180,22 +180,56 @@ def mar(im, show_result=True):
     result[metal_bw] = im[metal_bw]
     result[cm] = im[cm]
     
-    if show_result:
-        fig, axs = plt.subplots(1, 4)
+    # if show_result:
+    #     fig, axs = plt.subplots(1, 4)
+    #     axs[0].set_title('Original')
+    #     axs[0].imshow(im, vmin=-80, vmax=160)
+    #     axs[1].set_title('Linear Interpolation Correction')
+    #     axs[1].imshow(np.clip(linear_attenuation(im_li, True).astype(np.int16), -80, 160))
+    #     axs[2].set_title('NMAR 2')
+    #     axs[2].imshow(np.clip(result.astype(np.int16), -80, 160))
+    #     axs[3].set_title('Difference')
+    #     axs[3].imshow(np.abs(result - im))
+    #     plt.show()
+
+    if show_result or save_dir is not None:
+        fig, axs = plt.subplots(1, 4, figsize=(16, 4))
+
         axs[0].set_title('Original')
         axs[0].imshow(im, vmin=-80, vmax=160)
+        axs[0].axis('off')
+
         axs[1].set_title('Linear Interpolation Correction')
         axs[1].imshow(np.clip(linear_attenuation(im_li, True).astype(np.int16), -80, 160))
+        axs[1].axis('off')
+
         axs[2].set_title('NMAR 2')
         axs[2].imshow(np.clip(result.astype(np.int16), -80, 160))
+        axs[2].axis('off')
+
         axs[3].set_title('Difference')
         axs[3].imshow(np.abs(result - im))
-        plt.show()
+        axs[3].axis('off')
+
+        plt.tight_layout()
+
+        # ✅ save if path provided
+        if save_dir is not None:
+            filename = f"result_{int(time.time())}.png"
+            save_path = os.path.join(save_dir, filename)
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            plt.savefig(save_path, dpi=150)
+
+        if show_result:
+            plt.show()
+
+        plt.close(fig)
 
     return result
 
 
 if __name__ == '__main__':
-    im = np.load(r'E:\PycharmProjects\mar\NMAR\data/lung.npy')
+    im = np.load(r'D:\NMAR\test_01\npy_slice\slice.npy')
+    save_dir = r'D:\NMAR\test_01\results_slice'
 
-    mar(im, show_result=True)
+    mar(im, show_result=True, save_dir = save_dir)
